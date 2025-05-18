@@ -10,6 +10,7 @@ import zipfile
 import uuid
 import asyncio
 import os
+import urllib.parse
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:admin@localhost:5432/files")
 engine = create_engine(DATABASE_URL)
@@ -107,7 +108,12 @@ async def download_file(file_id: str):
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
     
-    headers = {"Content-Disposition": f'attachment; filename="{file.filename}"'}
+    # URL encode the filename for Content-Disposition header
+    encoded_filename = urllib.parse.quote(file.filename)
+    headers = {
+        "Content-Disposition": f'attachment; filename*=UTF-8\'\'{encoded_filename}',
+        "Access-Control-Expose-Headers": "Content-Disposition"
+    }
     
     extension = os.path.splitext(file.filename)[1].lower()
     content_type = "application/octet-stream"

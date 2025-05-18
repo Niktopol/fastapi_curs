@@ -9,7 +9,6 @@ export default function Download({ params }) {
 
   useEffect(() => {
     const downloadFile = async () => {
-      // If download has already started, don't start another one
       if (downloadStarted.current) {
         return;
       }
@@ -22,11 +21,20 @@ export default function Download({ params }) {
           throw new Error('File not found');
         }
 
-        // Get filename from Content-Disposition header
         const contentDisposition = response.headers.get('Content-Disposition');
-        const filename = contentDisposition
-          ? contentDisposition.split('filename=')[1].replace(/["']/g, '')
-          : 'downloaded-file';
+        let filename = 'downloaded-file';
+        
+        if (contentDisposition) {
+          const matches = contentDisposition.match(/filename\*=UTF-8''(.+)/i);
+          if (matches && matches[1]) {
+            filename = decodeURIComponent(matches[1]);
+          } else {
+            const filenameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+            if (filenameMatch && filenameMatch[1]) {
+              filename = filenameMatch[1];
+            }
+          }
+        }
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -47,7 +55,6 @@ export default function Download({ params }) {
 
     downloadFile();
 
-    // Cleanup function to reset the ref when component unmounts
     return () => {
       downloadStarted.current = false;
     };
