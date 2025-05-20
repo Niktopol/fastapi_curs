@@ -28,7 +28,7 @@ export default function Upload() {
     }
 
     if (uploadInProgress.current) {
-      return; // Prevent double submission
+      return;
     }
 
     setUploading(true);
@@ -47,7 +47,7 @@ export default function Upload() {
       });
       setUploadedId(response.data.id);
       toast.success('Files uploaded successfully!');
-      setFiles([]); // Clear files after successful upload
+      setFiles([]);
     } catch (error) {
       console.error('Upload error:', error);
       toast.error(error.response?.data?.detail || 'Error uploading files');

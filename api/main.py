@@ -108,7 +108,6 @@ async def download_file(file_id: str):
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
     
-    # URL encode the filename for Content-Disposition header
     encoded_filename = urllib.parse.quote(file.filename)
     headers = {
         "Content-Disposition": f'attachment; filename*=UTF-8\'\'{encoded_filename}',
