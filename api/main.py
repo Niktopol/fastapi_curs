@@ -47,7 +47,7 @@ async def cleanup_expired_files():
     while True:
         try:
             db = SessionLocal()
-            expiration_time = datetime.utcnow() - timedelta(hours=1)
+            expiration_time = datetime.utcnow() - timedelta(hours=12)
             db.execute(
                 delete(File).where(File.created_at < expiration_time)
             )
@@ -73,10 +73,10 @@ async def upload_files(files: list[UploadFile]):
         total_size += len(content)
         await file.seek(0)
     
-    if total_size > 20 * 1024 * 1024:
+    if total_size > 40 * 1024 * 1024:
         raise HTTPException(
             status_code=400,
-            detail="Total file size exceeds 20MB limit"
+            detail="Total file size exceeds 40MB limit"
         )
 
     file_id = str(uuid.uuid4())
